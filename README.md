@@ -28,7 +28,7 @@ Except by `Alt + '`, all keybindings above only work if playlist is visible.
 - Supports playlists with Kodi-like header manipulation, like this:
 
       https://example.com/playlist.m3u8|User-Agent=Firefox&Referer=https://foo.bar
-- Display channel title as `media-title` instead of weird names such as "*playlist.m3u8?token=yadayada*".
+- Displays channel name as `media-title` instead of weird names such as "*playlist.m3u8?token=yadayada*".
 - Added keys `Page Up`, `Page Down`, `Home` and `End` to navigate playlist items, original script only supports `↑` and `↓`.
 - Displays playlist in original order even if user has `shuffle` in `mpv.conf`.
 - Hides playlist right after selecting a channel.
