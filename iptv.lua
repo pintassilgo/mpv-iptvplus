@@ -1,14 +1,20 @@
 --redefine keybindings here if needed; multiple bindings are possible
 keybinds = {
-            activate = {'\\', 'MOUSE_BTN2'},
+            activate = {'Alt+\'', 'MOUSE_BTN2'},
+            hide = {'ESC'},
             plsup = {'UP', 'MOUSE_BTN3'},
             plsdown = {'DOWN', 'MOUSE_BTN4'},
-            plsenter = {'ENTER', 'MOUSE_BTN0'}
+            plspgup = {'PGUP'},
+            plspgdown = {'PGDWN'},
+            plshome = {'HOME'},
+            plsend = {'END'},
+            plsenter = {'ENTER'},
+            prevpl = {'Ctrl+BS'}
         }
 --hide playlist after specified number of seconds
-osd_time=10
+osd_time=900000
 --show only specified number of playlist entries
-window=7
+window=25
 --fade video when showing playlist
 fade=false
 --if fade=true; -100 — black, 0 — normal
@@ -22,70 +28,9 @@ local timer
 local pattern=""
 local is_active
 local is_playlist_loaded
+local playlists = {}
 
 -- UTF-8 lower/upper conversion
-local utf8_lc_uc = {
-  ["a"] = "A",
-  ["b"] = "B",
-  ["c"] = "C",
-  ["d"] = "D",
-  ["e"] = "E",
-  ["f"] = "F",
-  ["g"] = "G",
-  ["h"] = "H",
-  ["i"] = "I",
-  ["j"] = "J",
-  ["k"] = "K",
-  ["l"] = "L",
-  ["m"] = "M",
-  ["n"] = "N",
-  ["o"] = "O",
-  ["p"] = "P",
-  ["q"] = "Q",
-  ["r"] = "R",
-  ["s"] = "S",
-  ["t"] = "T",
-  ["u"] = "U",
-  ["v"] = "V",
-  ["w"] = "W",
-  ["x"] = "X",
-  ["y"] = "Y",
-  ["z"] = "Z",
-  ["а"] = "А",
-  ["б"] = "Б",
-  ["в"] = "В",
-  ["г"] = "Г",
-  ["д"] = "Д",
-  ["е"] = "Е",
-  ["ж"] = "Ж",
-  ["з"] = "З",
-  ["и"] = "И",
-  ["й"] = "Й",
-  ["к"] = "К",
-  ["л"] = "Л",
-  ["м"] = "М",
-  ["н"] = "Н",
-  ["о"] = "О",
-  ["п"] = "П",
-  ["р"] = "Р",
-  ["с"] = "С",
-  ["т"] = "Т",
-  ["у"] = "У",
-  ["ф"] = "Ф",
-  ["х"] = "Х",
-  ["ц"] = "Ц",
-  ["ч"] = "Ч",
-  ["ш"] = "Ш",
-  ["щ"] = "Щ",
-  ["ъ"] = "Ъ",
-  ["ы"] = "Ы",
-  ["ь"] = "Ь",
-  ["э"] = "Э",
-  ["ю"] = "Ю",
-  ["я"] = "Я",
-  ["ё"] = "Ё"
-}
-
 local utf8_uc_lc = {
   ["A"] = "a",
   ["B"] = "b",
@@ -145,13 +90,14 @@ local utf8_uc_lc = {
   ["Э"] = "э",
   ["Ю"] = "ю",
   ["Я"] = "я",
-  ["Ё"] = "ё"
+  ["Ё"] = "ё",
+  ["Ç"] = "ç"
 }
 
 --utf8 char pattern
 local utf8_char="[\1-\127\192-\223][\128-\191]*"
 
-local cyr_chars={'а','б','в','г','д','е','ё','ж','з','и','й','к','л','м','н','о','п','р','с','т','у','ф','х','ц','ч','ш','щ','ъ','ы','ь','э','ю','я'}
+local cyr_chars={'а','б','в','г','д','е','ё','ж','з','и','й','к','л','м','н','о','п','р','с','т','у','ф','х','ц','ч','ш','щ','ъ','ы','ь','э','ю','я','ç','Ç'}
 
 -- символы, которые возможно вводить для поиска
 local chars={}
@@ -213,13 +159,18 @@ local playlister = {
   cursor,
 
   init = function(self)
-    if not self.pls then
-      self.pls = mp.get_property_native("playlist")
-    end
+    mp.command('playlist-unshuffle')
+    self.pls = mp.get_property_native("playlist")
+    self.plsfiltered = nil
+    self.plspos = nil
+    self.wndstart = nil
+    self.wndend = nil
+    self.cursor = nil
+    cur = mp.get_property_native('playlist-current-pos') + 1
     mp.commandv("stop")
-    --need to mark first entry non-current (mpv bug?)
-    if self.pls[1] then
-      self.pls[1].current = false
+    --need to mark current entry non-current (mpv bug?)
+    if self.pls[cur] then
+      self.pls[cur].current = false
     end
     if favorites and #favorites>0 then
       self:sortfavs()
@@ -245,14 +196,15 @@ local playlister = {
   
     msg=""
     i = self.wndstart
-    local prefix
     while self.plsfiltered[i] and i<=self.wndstart+window-1 do
-      if self.pls[self.plsfiltered[i]].current then
-        prefix="*"
+      if i==self.wndstart+self.cursor and self.pls[self.plsfiltered[i]].current then
+        prefix = '▷'
       elseif i==self.wndstart+self.cursor then
-        prefix=">"
+        prefix = '▹'
+      elseif self.pls[self.plsfiltered[i]].current then
+        prefix = '▶'
       else
-        prefix="  "
+        prefix = '  '
       end
       msg = msg..prefix..(self.pls[self.plsfiltered[i]].title or "").."\n"
       i=i+1
@@ -320,19 +272,85 @@ local playlister = {
     end
   end,
 
+  pagedown = function(self)
+    if self.cursor==window-1 and #self.plsfiltered>self.wndstart+self.cursor then
+      self.wndstart=self.wndstart+window
+    end
+    if self.wndstart+window>#self.plsfiltered then
+      self.cursor=#self.plsfiltered-self.wndstart
+    else
+      self.cursor=window-1
+    end
+    self.show(self)
+  end,
+  pageup = function(self)
+    if self.cursor==0 then
+      if self.wndstart<=window then
+        self.wndstart=1
+      else
+        self.wndstart=self.wndstart-window
+      end
+    end
+    self.cursor=0
+    self.show(self)
+  end,
+
+  pend = function(self)
+    if #self.plsfiltered<window then
+      self.cursor=#self.plsfiltered-1
+    else
+      self.wndstart=#self.plsfiltered-window+1
+      self.cursor=window-1
+    end
+    self.show(self)
+  end,
+  home = function(self)
+    self.wndstart=1
+    self.cursor=0
+    self.show(self)
+  end,
+
   play = function(self)
-    mp.commandv("loadfile",self.pls[self.plsfiltered[self.wndstart+self.cursor]].filename)
+    item = self.pls[self.plsfiltered[self.wndstart+self.cursor]]
+    captures = {string.match(item.filename, '([^|]+)|?(.*)')}
+    if captures[2] ~= '' then
+      for k, v in string.gmatch(captures[2], '([^&]-)=([^&$]+)') do
+        if string.lower(k) == 'user-agent' then
+          mp.set_property('user-agent', v)
+        elseif string.lower(k) == 'referer' then
+          mp.set_property('referrer', v)
+        end
+      end
+    else
+      mp.set_property('user-agent', '')
+      mp.set_property('referrer', '')
+    end
+    mp.commandv("loadfile",captures[1],'replace','force-media-title=' .. item.title)
     if self.plspos then
       self.pls[self.plspos].current=false
     end
     self.plspos=self.plsfiltered[self.wndstart+self.cursor]
     self.pls[self.plspos].current=true
+    shutdown()
+  end,
+
+  previouspl = function(self)
+    if #playlists > 1 then
+      table.remove(playlists)
+      mp.commandv("loadfile", playlists[#playlists])
+      shutdown()
+    end
   end
 }
 
 function add_bindings()
+  keybinder.add("hide", shutdown, false)
   keybinder.add("plsup", up, true)
   keybinder.add("plsdown", down, true)
+  keybinder.add("plspgup", pageup, true)
+  keybinder.add("plspgdown", pagedown, true)
+  keybinder.add("plshome", home, true)
+  keybinder.add("plsend", pend, true)
   for i,v in ipairs(chars) do
     c=string.char(v)
     mp.add_forced_key_binding(c, 'search'..v, typing(c),"repeatable")
@@ -344,15 +362,23 @@ function add_bindings()
 
   mp.add_forced_key_binding('BS', 'searchbs', backspace,"repeatable")
   keybinder.add("plsenter", play)
+  keybinder.add("prevpl", previouspl)
   for i,v in ipairs(cyr_chars) do
     mp.add_forced_key_binding(v, 'search'..i+1000, typing(v),"repeatable")
   end
 end
 
 function remove_bindings()
+  keybinder.remove("hide")
   keybinder.remove('plsup')
   keybinder.remove('plsdown')
+  keybinder.remove('plspgup')
+  keybinder.remove('plspgdown')
+  keybinder.remove('plspgup')
+  keybinder.remove('plshome')
+  keybinder.remove('plsend')
   keybinder.remove('plsenter')
+  keybinder.remove('prevpl')
   for i,v in ipairs(chars) do
     c=string.char(v)
     mp.remove_key_binding('search'..v)
@@ -406,21 +432,11 @@ function mylower(s)
   return res
 end
 
-function myupper(s)
-  local res,n =  string.gsub(s,utf8_char,function (c) 
-                                    return utf8_lc_uc[c]
-                                 end)
-  return res
-end
-
 function prepat(s)
 --prepare nocase and magic chars
   s = string.gsub(s, "[%^%$%(%)%%%.%[%]%*%+%-%?]",function (c)
         return '%'..c
       end)
---[[  s = string.gsub(s, utf8_char, function (c)
-        return string.format("[%s%s]", utf8_uc_lc[c] or c, utf8_lc_uc[c] or c)
-      end)]]
   return s
 end
 
@@ -456,7 +472,6 @@ function play()
 --  mp.commandv("playlist-next")
   fader:off()
   playlister:play()
-  playlister:show()
   resumetimer()
 end
 
@@ -479,25 +494,60 @@ function up()
   resumetimer()
 end
 
+function pagedown()
+  fader:on()
+  playlister:pagedown()
+  resumetimer()
+end
+
+function pageup()
+  fader:on()
+  playlister:pageup()
+  resumetimer()
+end
+
+function home()
+  fader:on()
+  playlister:home()
+  resumetimer()
+end
+
+function pend()
+  fader:on()
+  playlister:pend()
+  resumetimer()
+end
+
+function previouspl()
+  fader:off()
+  playlister:previouspl()
+  resumetimer()
+end
+
+local path
 function on_start_file()
-  if is_playlist_loaded then
+  if mp.get_property_native("playlist-count")>1 then
+    if playlists[#playlists]~=path then
+      table.insert(playlists, path)
+    end
     playlister:init()
-    mp.unregister_event(on_start_file)
     activate()
   else
-    is_playlist_loaded = true
+    path = mp.get_property("path")
   end
 end
 
---~ function on_shutdown()
-  --~ fader:off()
---~ end
-
-if mp.get_opt("iptv") then
+function start()
   mp.set_property_bool("idle", true)
   mp.set_property_bool("force-window", true)
   mp.register_event("start-file", on_start_file)
-  --~ mp.register_event("end-file", on_shutdown)
   keybinder.add("activate", activate)
 end
+
+function on_script_opts_change(name, value)
+    if value == 'iptv=1' then
+      start()
+    end
+end
+mp.observe_property('script-opts', 'string', on_script_opts_change)
 
