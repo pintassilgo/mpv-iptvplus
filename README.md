@@ -32,7 +32,7 @@ Except by `Alt + '`, all keybindings above only work if playlist is visible.
 - Added keys `Page Up`, `Page Down`, `Home` and `End` to navigate playlist items, original script only supports `↑` and `↓`.
 - Displays playlist in original order even if user has `shuffle` in `mpv.conf`.
 - Hides playlist right after selecting a channel.
-- Support multiple providers *aka* playlist pointing to other playlists. Example:
+- Support multiple providers *i.e.* playlist pointing to other playlists. Example:
 
       #EXTM3U
       #EXTINF:0, List 1
