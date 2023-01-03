@@ -9,6 +9,7 @@ Script for watching iptv with mpv.
 ### Run
 
 - `mpv --script-opts=iptv=1 playlist.m3u`
+- Read `Suggestions` section below for a user-friendly way to run.
 
 ### Key bindings
 
@@ -51,8 +52,31 @@ Except by `Alt + '`, all keybindings above only work if playlist is visible.
 - Removed left-click binding to work as `Enter` (to play selected item).
 - Removed right-click binding to show/hide playlist because I use right-click to show context-menu.
 
-### Sugestions
+### Suggestions
 
 - Install [uosc](https://github.com/tomasklaen/uosc) to turn mpv into the typical media player with useful buttons, indicators and menus.
 - Add `<idle>command:live_tv:set script-opts iptv=1;loadfile /your/playlist/path.m3u?IPTV [Alt+']` in the `controls=` line in your `uosc.conf` to create a button to activate IPTV.
 - You can also create a context-menu item.
+
+### Screenshots (click to display)
+
+<details>
+  <summary>Button in mpv interface to start IPTV (the screenshot was taken while hovering the button)</summary>
+  
+  ![image](https://user-images.githubusercontent.com/5483864/210293865-7f65f0f9-1ed3-4f91-857d-3c8ccc5018c4.png)
+</details>
+<details>
+  <summary>Context-menu item to start IPTV</summary>
+  
+  ![image](https://user-images.githubusercontent.com/5483864/210294042-0b8811b4-b892-47bc-bd47-366e5021e53c.png)
+</details>
+<details>
+  <summary>Playlist of playlists</summary>
+  
+  ![image](https://user-images.githubusercontent.com/5483864/210294138-3e0eb942-3a3f-4157-9846-898bee284dd7.png)
+</details>
+<details>
+  <summary>Playing channel and filtering playlist</summary>
+  
+  ![image](https://user-images.githubusercontent.com/5483864/210294334-e43ac0aa-1932-4620-85db-27836a279798.png)
+</details>
