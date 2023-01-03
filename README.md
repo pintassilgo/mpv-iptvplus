@@ -52,6 +52,7 @@ Except by `Alt + '`, all keybindings above only work if playlist is visible.
 - Number of displayed items on screen increased to `25`, you should adjust depending on your screen size and your `osd-font-size` value in `mpv.conf` (mine is `24`).
 - Removed left-click binding to work as `Enter` (to play selected item).
 - Removed right-click binding to show/hide playlist because I use right-click to show context-menu.
+- Allow to set default `User-Agent` for IPTV.
 
 ### Suggestions
 
