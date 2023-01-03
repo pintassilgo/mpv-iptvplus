@@ -2,26 +2,57 @@
 
 Script for watching iptv with mpv.
 
-INSTALL
+### Install
 
-	Put in ~/.config/mpv/scripts/
+- Save `iptv.lua` in `/mpv/scripts/`.
 
-RUN
+### Run
 
-	mpv --script-opts=iptv=1 playlist.m3u
+- `mpv --script-opts=iptv=1 playlist.m3u`
 
-CONTROL
+### Key bindings
 
-	\ or Mouse right click — to show/hide playlist
+You can change them by editing the file.
 
-	UP/DOWN or Mouse scroll — to navigate
+- `Alt + '`: show/hide playlist (for channel selection)
+- `Esc`: hide playlist
+- `↑`, `↓`, `Page Up`, `Page Down`, `Home`, `End`, `wheel up`, `wheel down`: navigate playlist items
+- `Ctrl + Backspace`: return to previous playlist
+- type to search/filter
 
-	type with keyboard — to search incrementally
+Except by `Alt + '`, all keybindings above only work if playlist is visible.
 
-	ENTER or Mouse left click — to play
+### Comparison with original [iptv.lua](https://github.com/gthreepw00d/mpv-iptv) (differences and new features)
 
-OTHER FEATURES
+- Supports playlists with Kodi-like header manipulation, like this:
 
-* user-defined list of favorites to promote to the top of playlist
-* fade picture when displaying playlist
-* redefinable keybindings (for example, to disable  mouse support remove all 'MOUSE_*' values from "keybinds" array in iptv.lua)
+      https://example.com/playlist.m3u8|User-Agent=Firefox&Referer=https://foo.bar
+- Display channel title as `media-title` instead of weird names such as "*playlist.m3u8?token=yadayada*".
+- Added keys `Page Up`, `Page Down`, `Home` and `End` to navigate playlist items, original script only supports `↑` and `↓`.
+- Displays playlist in original order even if user has `shuffle` in `mpv.conf`.
+- Hides playlist right after selecting a channel.
+- Support multiple providers *aka* playlist pointing to other playlists. Example:
+
+      #EXTM3U
+      #EXTINF:0, List 1
+      https://example.com/playlist.m3u8
+      #EXTINF:0, List 2
+      https://example.com/playlist2.m3u8
+      #EXTINF:0, List 3
+      https://example.com/playlist3.m3u8
+      #EXTINF:0, Sports Channels
+      https://example.com/sports.m3u8
+- If you have a playlist pointing to other playlists as per above, you can return to *parent* playlist by pressing `Ctrl + Backspace`.
+- Added `Esc` as an intuitive way to hide playlist.
+- Changed default keybinding to show/hide playlist from `z` to `Alt+'` (because `z` is already mapped on my profile).
+- Increased `osd_time` to giant number to *never* hide playlist unless by user action (after selecting a channel or pressing key to hide it).
+- Changed characters to display playing item and selected item. For instance, original uses `*` for playing item, my script uses `▷`.
+- Increased amount of items to display to `25`, you should adjust depending on your screen size and your `osd-font-size` value in `mpv.conf` (mine is `24`).
+- Removed left-click binding to work as `Enter` (to play selected item).
+- Removed right-click binding to show/hide playlist because I use right-click to show context-menu.
+
+### Sugestions
+
+- Install [uosc](https://github.com/tomasklaen/uosc) to turn mpv into the typical media player with useful buttons, indicators and menus.
+- Add `<idle>command:live_tv:set script-opts iptv=1;loadfile /your/playlist/path.m3u?IPTV [Alt+']` in the `controls=` line in your `uosc.conf` to create a button to activate IPTV.
+- You can also create a context-menu item.
