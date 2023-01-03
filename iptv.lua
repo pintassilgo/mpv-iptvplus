@@ -249,6 +249,9 @@ local playlister = {
   filter = function(self)
     self.plsfiltered={}
     for i,v in ipairs(self.pls) do
+      if v.title == nil then
+        v.title = string.match(v.filename, '[^|]+')
+      end
       if string.match(mylower(v.title),'.*'..prepat(pattern)..'.*') then
         table.insert(self.plsfiltered,i)
       end
