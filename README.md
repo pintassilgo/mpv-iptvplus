@@ -45,6 +45,8 @@ Except by `Alt + '`, all keybindings above only work if playlist is visible.
       #EXTINF:0, Sports Channels
       https://example.com/sports.m3u8
 - If you have a playlist pointing to other playlists as per above, you can return to *parent* playlist by pressing `Ctrl + Backspace`.
+- Provides visual indicator when a channel fails to load.
+- Displays item URL instead of an empty slot when a channel has no name.
 - Added `Esc` as an intuitive way to hide playlist.
 - Changed default keybinding to show/hide playlist from `z` to `Alt+'` (because `z` is already mapped on my profile).
 - Increased `osd_time` to giant number to *never* hide playlist unless by user action (after selecting a channel or pressing key to hide it).
