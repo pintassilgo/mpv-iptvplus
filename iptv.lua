@@ -14,7 +14,7 @@ keybinds = {
 --hide playlist after specified number of seconds
 osd_time=900000
 --show only specified number of playlist entries
-window=25
+window=24
 --fade video when showing playlist
 fade=false
 --if fade=true; -100 — black, 0 — normal
@@ -30,6 +30,7 @@ local pattern=""
 local is_active
 local is_playlist_loaded
 local playlists = {}
+local error
 
 -- UTF-8 lower/upper conversion
 local utf8_uc_lc = {
@@ -199,7 +200,9 @@ local playlister = {
     i = self.wndstart
     while self.plsfiltered[i] and i<=self.wndstart+window-1 do
       prefix = ''
-      if i==self.wndstart+self.cursor and self.pls[self.plsfiltered[i]].current then
+      if error and self.pls[self.plsfiltered[i]].current then
+        prefix = '🛇 '
+      elseif i==self.wndstart+self.cursor and self.pls[self.plsfiltered[i]].current then
         prefix = '▷ '
       elseif i==self.wndstart+self.cursor then
         prefix = '▹ '
@@ -225,7 +228,11 @@ local playlister = {
     if self.wndstart+window-1<#self.plsfiltered then
       msg = msg.."..."
     end
-    msg="/"..pattern.."\n"..msg
+    if string.len(pattern) > 0 then
+      msg="\nFilter: "..pattern.."\n"..msg
+    else
+      msg="\n\n\n"..msg
+    end
     mp.osd_message(msg, osd_time)
   end,
 
@@ -537,6 +544,7 @@ end
 
 local path
 function on_start_file()
+  error = false
   if mp.get_property_native("playlist-count")>1 then
     if playlists[#playlists]~=path then
       table.insert(playlists, path)
@@ -563,3 +571,8 @@ function on_script_opts_change(name, value)
 end
 mp.observe_property('script-opts', 'string', on_script_opts_change)
 
+function on_error()
+    error = true
+    activate();
+end
+mp.add_hook('on_load_fail', 50, on_error)
