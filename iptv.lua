@@ -21,6 +21,7 @@ fade=false
 plsbrightness=-70
 --favorites get promotion to the top of the pls
 favorites = {}
+default_user_agent = 'Mozilla'
 -- END OF CONFIGURABLE VARIABLES
 
 local timer
@@ -197,14 +198,21 @@ local playlister = {
     msg=""
     i = self.wndstart
     while self.plsfiltered[i] and i<=self.wndstart+window-1 do
+      prefix = ''
       if i==self.wndstart+self.cursor and self.pls[self.plsfiltered[i]].current then
-        prefix = '▷'
+        prefix = '▷ '
       elseif i==self.wndstart+self.cursor then
-        prefix = '▹'
+        prefix = '▹ '
       elseif self.pls[self.plsfiltered[i]].current then
-        prefix = '▶'
+        prefix = '▶ '
       else
-        prefix = '  '
+        prefix = '   '
+      end
+      if self.pls[self.plsfiltered[i]].title == nil then
+        self.pls[self.plsfiltered[i]].title = string.match(self.pls[self.plsfiltered[i]].filename, '[^|]+')
+      end
+      if self.pls[self.plsfiltered[i]].title:byte(1) ~= 32 then
+        prefix = prefix .. ' '
       end
       msg = msg..prefix..(self.pls[self.plsfiltered[i]].title or "").."\n"
       i=i+1
@@ -322,7 +330,7 @@ local playlister = {
         end
       end
     else
-      mp.set_property('user-agent', '')
+      mp.set_property('user-agent', default_user_agent)
       mp.set_property('referrer', '')
     end
     mp.commandv("loadfile",captures[1],'replace','force-media-title=' .. item.title)
@@ -546,6 +554,7 @@ end
 
 function on_script_opts_change(name, value)
     if value == 'iptv=1' then
+      mp.unobserve_property(on_script_opts_change)
       start()
     end
 end
