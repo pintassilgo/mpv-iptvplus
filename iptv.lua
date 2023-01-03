@@ -170,6 +170,7 @@ local playlister = {
     if restore ~= true then
       self.wndstart = nil
       self.cursor = nil
+    else
       restore = false
     end
     cur = mp.get_property_native('playlist-current-pos') + 1
