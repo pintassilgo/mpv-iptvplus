@@ -201,7 +201,7 @@ local playlister = {
     while self.plsfiltered[i] and i<=self.wndstart+window-1 do
       prefix = ''
       if error and self.pls[self.plsfiltered[i]].current then
-        prefix = '🛇 '
+        prefix = '🛇'
       elseif i==self.wndstart+self.cursor and self.pls[self.plsfiltered[i]].current then
         prefix = '▷ '
       elseif i==self.wndstart+self.cursor then
@@ -573,6 +573,7 @@ mp.observe_property('script-opts', 'string', on_script_opts_change)
 
 function on_error()
     error = true
+    is_active = false
     activate();
 end
 mp.add_hook('on_load_fail', 50, on_error)
