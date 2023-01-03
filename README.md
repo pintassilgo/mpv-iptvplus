@@ -49,7 +49,7 @@ Except by `Alt + '`, all keybindings above only work if playlist is visible.
 - Changed default keybinding to show/hide playlist from `z` to `Alt+'` (because `z` is already mapped on my profile).
 - Increased `osd_time` to giant number to *never* hide playlist unless by user action (after selecting a channel or pressing key to hide it).
 - Changed characters to display playing item and selected item. For instance, original uses `*` for playing item, my script uses `▷`.
-- Number of displayed items on screen increased to `25`, you should adjust depending on your screen size and your `osd-font-size` value in `mpv.conf` (mine is `24`).
+- Number of displayed items on screen increased to `24`, you should adjust depending on your screen size and your `osd-font-size` value in `mpv.conf` (mine is `24`).
 - Removed left-click binding to work as `Enter` (to play selected item).
 - Removed right-click binding to show/hide playlist because I use right-click to show context-menu.
 - Allow to set default `User-Agent` for IPTV.
@@ -75,7 +75,7 @@ Except by `Alt + '`, all keybindings above only work if playlist is visible.
 <details>
   <summary>Playing channel and filtering playlist</summary>
   
-  ![image](https://user-images.githubusercontent.com/5483864/210294334-e43ac0aa-1932-4620-85db-27836a279798.png)
+  ![image](https://user-images.githubusercontent.com/5483864/210318505-5d1aec55-9c0c-4cf2-9734-491c57a69cb6.png)
 </details>
 <details>
   <summary>Displaying channel name</summary>
