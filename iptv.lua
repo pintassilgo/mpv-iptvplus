@@ -217,7 +217,7 @@ local playlister = {
       if self.pls[self.plsfiltered[i]].title:byte(1) ~= 32 then
         prefix = prefix .. ' '
       end
-      msg = msg..prefix..(self.pls[self.plsfiltered[i]].title or "").."\n"
+      msg = msg..prefix..self.pls[self.plsfiltered[i]].title.."\n"
       i=i+1
     end
     if self.wndstart>1 then
