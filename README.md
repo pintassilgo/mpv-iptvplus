@@ -80,3 +80,8 @@ Except by `Alt + '`, all keybindings above only work if playlist is visible.
   
   ![image](https://user-images.githubusercontent.com/5483864/210294334-e43ac0aa-1932-4620-85db-27836a279798.png)
 </details>
+<details>
+  <summary>Displaying channel name</summary>
+  
+  ![image](https://user-images.githubusercontent.com/5483864/210294575-a781ba64-797e-45a6-b80a-0f00b72304c6.png)
+</details>
