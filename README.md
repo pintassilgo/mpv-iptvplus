@@ -32,7 +32,7 @@ Except by `Alt + '`, all keybindings above only work if playlist is visible.
 - Added keys `Page Up`, `Page Down`, `Home` and `End` to navigate playlist items, original script only supports `↑` and `↓`.
 - Displays playlist in original order even if user has `shuffle` in `mpv.conf`.
 - Hides playlist right after selecting a channel.
-- Support multiple providers *i.e.* playlist pointing to other playlists. Example:
+- Supports multiple providers *i.e.* playlist pointing to other playlists. Example:
 
       #EXTM3U
       #EXTINF:0, List 1
@@ -48,14 +48,14 @@ Except by `Alt + '`, all keybindings above only work if playlist is visible.
 - Changed default keybinding to show/hide playlist from `z` to `Alt+'` (because `z` is already mapped on my profile).
 - Increased `osd_time` to giant number to *never* hide playlist unless by user action (after selecting a channel or pressing key to hide it).
 - Changed characters to display playing item and selected item. For instance, original uses `*` for playing item, my script uses `▷`.
-- Increased amount of items to display to `25`, you should adjust depending on your screen size and your `osd-font-size` value in `mpv.conf` (mine is `24`).
+- Number of displayed items on screen increased to `25`, you should adjust depending on your screen size and your `osd-font-size` value in `mpv.conf` (mine is `24`).
 - Removed left-click binding to work as `Enter` (to play selected item).
 - Removed right-click binding to show/hide playlist because I use right-click to show context-menu.
 
 ### Suggestions
 
 - Install [uosc](https://github.com/tomasklaen/uosc) to turn mpv into the typical media player with useful buttons, indicators and menus.
-- Add `<idle>command:live_tv:set script-opts iptv=1;loadfile /your/playlist/path.m3u?IPTV [Alt+']` in the `controls=` line in your `uosc.conf` to create a button to activate IPTV.
+- Add `<idle>command:live_tv:set script-opts iptv=1;loadfile /your/playlist/path.m3u?IPTV [Alt+']` in the `controls=` line of your `uosc.conf` to create a button to activate IPTV.
 - You can also create a context-menu item.
 
 ### Screenshots (click to display)
