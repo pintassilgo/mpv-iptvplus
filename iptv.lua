@@ -31,6 +31,7 @@ local is_active
 local is_playlist_loaded
 local playlists = {}
 local error
+local restore
 
 -- UTF-8 lower/upper conversion
 local utf8_uc_lc = {
@@ -165,9 +166,12 @@ local playlister = {
     self.pls = mp.get_property_native("playlist")
     self.plsfiltered = nil
     self.plspos = nil
-    self.wndstart = nil
     self.wndend = nil
-    self.cursor = nil
+    if restore ~= true then
+      self.wndstart = nil
+      self.cursor = nil
+      restore = false
+    end
     cur = mp.get_property_native('playlist-current-pos') + 1
     mp.commandv("stop")
     --need to mark current entry non-current (mpv bug?)
@@ -212,7 +216,8 @@ local playlister = {
         prefix = '   '
       end
       if self.pls[self.plsfiltered[i]].title == nil then
-        self.pls[self.plsfiltered[i]].title = string.match(self.pls[self.plsfiltered[i]].filename, '[^|]+')
+        filepath = string.gsub(self.pls[self.plsfiltered[i]].filename, '^plugin://plugin.video.f4mTester/.-&url=', '')
+        self.pls[self.plsfiltered[i]].title = string.match(filepath, '[^|]+')
       end
       if self.pls[self.plsfiltered[i]].title:byte(1) ~= 32 then
         prefix = prefix .. ' '
@@ -257,7 +262,8 @@ local playlister = {
     self.plsfiltered={}
     for i,v in ipairs(self.pls) do
       if v.title == nil then
-        v.title = string.match(v.filename, '[^|]+')
+        filepath = string.gsub(v.filename, '^plugin://plugin.video.f4mTester/.-&url=', '')
+        v.title = string.match(filepath, '[^|]+')
       end
       if string.match(mylower(v.title),'.*'..prepat(pattern)..'.*') then
         table.insert(self.plsfiltered,i)
@@ -330,7 +336,8 @@ local playlister = {
 
   play = function(self)
     item = self.pls[self.plsfiltered[self.wndstart+self.cursor]]
-    captures = {string.match(item.filename, '([^|]+)|?(.*)')}
+    filepath = string.gsub(item.filename, '^plugin://plugin.video.f4mTester/.-&url=', '')
+    captures = {string.match(filepath, '([^|]+)|?(.*)')}
     if captures[2] ~= '' then
       for k, v in string.gmatch(captures[2], '([^&]-)=([^&$]+)') do
         if string.lower(k) == 'user-agent' then
@@ -354,8 +361,11 @@ local playlister = {
 
   previouspl = function(self)
     if #playlists > 1 then
+      restore = true
+      self.wndstart = playlists[#playlists].wndstart
+      self.cursor = playlists[#playlists].cursor
       table.remove(playlists)
-      mp.commandv("loadfile", playlists[#playlists])
+      mp.commandv("loadfile", playlists[#playlists].path)
       shutdown()
     end
   end
@@ -546,8 +556,12 @@ local path
 function on_start_file()
   error = false
   if mp.get_property_native("playlist-count")>1 then
-    if playlists[#playlists]~=path then
-      table.insert(playlists, path)
+    if #playlists == 0 or playlists[#playlists].path~=path then
+      table.insert(playlists, {
+        wndstart = playlister.wndstart,
+        path = path,
+        cursor = playlister.cursor
+      })
     end
     playlister:init()
     activate()
