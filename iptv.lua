@@ -1,6 +1,6 @@
 --redefine keybindings here if needed; multiple bindings are possible
 keybinds = {
-            activate = {'Alt+\'', 'MOUSE_BTN2'},
+            activate = {'Alt+\''},
             hide = {'ESC'},
             plsup = {'UP', 'MOUSE_BTN3'},
             plsdown = {'DOWN', 'MOUSE_BTN4'},
