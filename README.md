@@ -58,7 +58,7 @@ Except by `Alt + '`, all keybindings above only work if playlist is visible.
 - Add `<idle>command:live_tv:set script-opts iptv=1;loadfile /your/playlist/path.m3u?IPTV [Alt+']` in the `controls=` line of your `uosc.conf` to create a button to activate IPTV.
 - You can also create a context-menu item.
 
-### Screenshots (click to display)
+### Screenshots (click to show)
 
 <details>
   <summary>Button in mpv interface to start IPTV (the screenshot was taken while hovering the button)</summary>
@@ -69,11 +69,6 @@ Except by `Alt + '`, all keybindings above only work if playlist is visible.
   <summary>Context-menu item to start IPTV</summary>
   
   ![image](https://user-images.githubusercontent.com/5483864/210294042-0b8811b4-b892-47bc-bd47-366e5021e53c.png)
-</details>
-<details>
-  <summary>Playlist of playlists</summary>
-  
-  ![image](https://user-images.githubusercontent.com/5483864/210294138-3e0eb942-3a3f-4157-9846-898bee284dd7.png)
 </details>
 <details>
   <summary>Playing channel and filtering playlist</summary>
