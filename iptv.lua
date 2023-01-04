@@ -21,7 +21,7 @@ fade=false
 plsbrightness=-70
 --favorites get promotion to the top of the pls
 favorites = {}
-default_user_agent = 'Mozilla'
+default_user_agent = 'Mozilla/5.0'
 -- END OF CONFIGURABLE VARIABLES
 
 local timer
@@ -266,7 +266,7 @@ local playlister = {
         filepath = string.gsub(v.filename, '^plugin://plugin.video.f4mTester/.-&url=', '')
         v.title = string.match(filepath, '[^|]+')
       end
-      if string.match(mylower(v.title),'.*'..prepat(pattern)..'.*') then
+      if string.match(mylower(string.sub(v.title, -50)),'.*'..prepat(pattern)..'.*') then
         table.insert(self.plsfiltered,i)
       end
     end
